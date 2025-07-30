@@ -50,13 +50,13 @@
             
             try {
                 // Отправляем запрос к вашему боту через прокси
-                const response = await fetch('https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getChatMember', {
+                const response = await fetch('https://api.telegram.org/bot8252785543:AAFjc_rvmMhZqsqllX3uhP0XDHmwOTuqURA/getChatMember', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        chat_id: '@<YOUR_CHANNEL>',
+                        chat_id: '@mane_karl',
                         user_id: tg.initDataUnsafe.user.id
                     })
                 });
@@ -68,7 +68,7 @@
                     checkBtn.classList.add('hidden');
                     participateBtn.classList.remove('hidden');
                 } else {
-                    statusEl.textContent = '❌ Подпишитесь на канал @<YOUR_CHANNEL>';
+                    statusEl.textContent = '❌ Подпишитесь на канал @mane_karl';
                 }
             } catch (error) {
                 statusEl.textContent = 'Ошибка при проверке подписки';
