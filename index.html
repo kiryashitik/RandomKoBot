@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contest Bot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; background: #0088cc; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>🎉 Конкурс</h1>
+        <div id="status">Загрузка...</div>
+        <button id="checkBtn" class="hidden">Проверить подписку</button>
+        <button id="participateBtn" class="hidden">Участвовать</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const tg = WebApp;
+        tg.expand();
+        
+        const statusEl = document.getElementById('status');
+        const checkBtn = document.getElementById('checkBtn');
+        const participateBtn = document.getElementById('participateBtn');
+        const resultEl = document.getElementById('result');
+        
+        // Показываем интерфейс после инициализации
+        tg.ready();
+        checkBtn.classList.remove('hidden');
+        statusEl.textContent = 'Нажмите "Проверить подписку"';
+        
+        checkBtn.addEventListener('click', async () => {
+            statusEl.textContent = 'Проверяем...';
+            
+            try {
+                const response = await fetch('/check_subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: tg.initDataUnsafe.user?.id,
+                        channel: '@your_channel' // Замените на ваш канал
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.is_subscribed) {
+                    statusEl.textContent = '✅ Вы подписаны!';
+                    checkBtn.classList.add('hidden');
+                    participateBtn.classList.remove('hidden');
+                } else {
+                    statusEl.textContent = '❌ Подпишитесь на канал';
+                }
+            } catch (error) {
+                statusEl.textContent = 'Ошибка проверки';
+                console.error(error);
+            }
+        });
+        
+        participateBtn.addEventListener('click', async () => {
+            statusEl.textContent = 'Регистрируем участие...';
+            
+            try {
+                const response = await fetch('/participate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: tg.initDataUnsafe.user?.id,
+                        username: tg.initDataUnsafe.user?.username,
+                        first_name: tg.initDataUnsafe.user?.first_name,
+                        last_name: tg.initDataUnsafe.user?.last_name
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultEl.innerHTML = '<p>🎉 Вы участвуете в конкурсе!</p>';
+                    participateBtn.classList.add('hidden');
+                } else {
+                    resultEl.textContent = 'Ошибка: ' + data.message;
+                }
+            } catch (error) {
+                resultEl.textContent = 'Ошибка подключения';
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>
